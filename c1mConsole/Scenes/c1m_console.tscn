@@ -1,0 +1,36 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://c1mConsole/Scripts/c1m_console.gd" type="Script" id=1]
+[ext_resource path="res://c1mConsole/Theme/c1m_console_theme.theme" type="Theme" id=2]
+
+[node name="c1mConsole" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+output_line_number_clr = Color( 0, 1, 0.501961, 1 )
+
+[node name="Input" type="LineEdit" parent="."]
+anchor_right = 1.0
+margin_bottom = 40.0
+placeholder_text = "Console Input"
+caret_blink = true
+
+[node name="Output" type="RichTextLabel" parent="."]
+anchor_right = 1.0
+margin_top = 40.0
+margin_bottom = 160.0
+focus_mode = 2
+bbcode_enabled = true
+bbcode_text = "Console Output"
+text = "Console Output"
+scroll_following = true
+selection_enabled = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="text_changed" from="Input" to="." method="_on_Input_text_changed"]
+[connection signal="text_entered" from="Input" to="." method="_on_Input_text_entered"]

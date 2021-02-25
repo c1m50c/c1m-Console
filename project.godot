@@ -1,0 +1,31 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=4
+
+_global_script_classes=[ {
+"base": "Reference",
+"class": "ConsoleCommand",
+"language": "GDScript",
+"path": "res://c1mConsole/Scripts/console_command.gd"
+} ]
+_global_script_class_icons={
+"ConsoleCommand": "res://c1mConsole/Assets/Textures/console_command_class_icon.png"
+}
+
+[application]
+
+config/name="c1m Console - v0.0.1"
+run/main_scene="res://c1mConsole/Scenes/c1m_console.tscn"
+boot_splash/image="res://c1mConsole/Assets/Textures/console_command_class_icon.png"
+boot_splash/fullsize=false
+config/icon="res://c1mConsole/Assets/Textures/console_command_class_icon.png"
+
+[rendering]
+
+environment/default_environment="res://default_env.tres"
