@@ -5,9 +5,12 @@ extends Reference
 enum ARG_TYPES { INT, FLOAT, BOOL, STRING, VEC2, VEC3 }
 
 # Class Variables
+var help_info: Array = [
+	# Holds strings that get printed to the output when the 'help' command is executed
+]
 var command_triggers: Array = [
 	"command_trigger", # Command Name
-	ARG_TYPES.STRING, # Argument 1 ( Unlimited )
+	ARG_TYPES.STRING, # Argument 1 ( Unlimited Args )
 	ARG_TYPES.INT, # Argument 2
 ]
 

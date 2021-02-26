@@ -1,19 +1,34 @@
 extends ConsoleCommand
 
+# Variables -> Data
+var commands: Array = [  ]
+
+
+
+
 # Extended Functions
 func _init() -> void:
 	command_triggers = ["help"]
+	help_info = ["help"]
 
 
 func _execute_command(_args: Array = []) -> String:
-	print(get_cc_scripts())
-	return ""
+	var rstring: String = "Help Info: [\n"
+	if commands.empty():
+		commands = get_console_commands()
+
+	for cmd in commands:
+		rstring = rstring + "[color=#ff7800][b]%s:[/b][/color] %s\n" % [
+				cmd.command_triggers[0], cmd.help_info]
+	rstring = rstring + "]"
+
+	return rstring
 
 
 
 
 # Class Functions
-func get_cc_scripts() -> Array:
+func get_console_commands() -> Array:
 	var array: Array = [  ]
 
 	var dir: Directory = Directory.new()
@@ -26,6 +41,12 @@ func get_cc_scripts() -> Array:
 			if not dir.current_is_dir(): # Item is File
 				file_names.append(file_name)
 			file_name = dir.get_next()
+	
+	for name in file_names:
+		var cc_script: GDScript = load("res://c1mConsole/ConsoleCommands/%s" % name)
+		var cc: ConsoleCommand = ConsoleCommand.new()
+		cc.set_script(cc_script)
+		array.append(cc)
 
-	array.append(file_names)
+	print(array)
 	return array

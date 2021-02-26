@@ -1,10 +1,11 @@
 extends Control
 
 # Class Variables -> OnReady
-onready var Input: LineEdit = $Input
-onready var Output: RichTextLabel = $Output
+onready var ConsoleInput: LineEdit = $Input
+onready var ConsoleOutput: RichTextLabel = $Output
 
 # Class Variables -> Exported
+export(bool) var hide_on_ready: bool = true
 export(Color) var output_line_number_clr: Color = Color(0, 1, 0.5)
 
 # Class Variables -> Data
@@ -16,8 +17,15 @@ var console_commands: Array = [  ]
 
 # Extended Fucntions
 func _ready() -> void:
+	visible = !hide_on_ready
 	clear_output()
 	create_console_commands()
+
+
+func _input(event: InputEvent) -> void:
+	var just_pressed: bool = event.is_pressed() and not event.is_echo()
+	if Input.is_key_pressed(KEY_QUOTELEFT) and just_pressed:
+		visible = !visible
 
 
 
@@ -54,28 +62,93 @@ func _on_Input_text_entered(new_text: String) -> void:
 	process_command(new_text)
 
 
+func _on_ClearOutput_pressed() -> void:
+	clear_output()
+
+
 
 
 # Class Functions -> IO
 func clear_output() -> void:
-	Output.bbcode_text = "[ Beginning of Console Output ]"
+	ConsoleOutput.bbcode_text = "[ Beginning of Console Output ]"
 	output_line_count = 0
 
 
 func write_to_output(text: String) -> void:
+	if text.empty():
+		return
+	elif text.begins_with("!"):
+		var text_split: PoolStringArray = text.split("!", false, 1)
+		write_error_to_output(text_split[0])
+		return
+
 	output_line_count += 1
-	Output.bbcode_text = Output.bbcode_text + "\n%s %s" % [ 
+	ConsoleOutput.bbcode_text = ConsoleOutput.bbcode_text + "\n%s %s" % [ 
 			"[color=#%s]" % [output_line_number_clr.to_html()] + str(output_line_count) + ".[/color]", 
 			text ]
 
 
+func write_error_to_output(description: String) -> void:
+	if description.empty():
+		return
+
+	output_line_count += 1
+	ConsoleOutput.bbcode_text = ConsoleOutput.bbcode_text + "\n%s %s" % [ 
+			"[color=#%s]" % [output_line_number_clr.to_html()] + str(output_line_count) + ".[/color]", 
+			"[color=#ff0000][b]ERROR: [/b][/color]" + description]
 
 
-# Class Functions -> Processing
+
+
+# Class Functions -> Command Processing
+func check_trigger_type(trigger: String, type: int) -> bool:
+	match type:
+		ConsoleCommand.ARG_TYPES.INT:
+			return trigger.is_valid_integer()
+		ConsoleCommand.ARG_TYPES.FLOAT:
+			return trigger.is_valid_float()
+		ConsoleCommand.ARG_TYPES.BOOL:
+			return trigger == "true" or trigger == "false"
+		ConsoleCommand.ARG_TYPES.STRING:
+			return true
+		ConsoleCommand.ARG_TYPES.VEC2:
+			var split_str: PoolStringArray = trigger.split(",", false, 2)
+			if split_str.size() == 2:
+				if split_str[0].is_valid_float():
+					if split_str[1].is_valid_float():
+						return true
+		ConsoleCommand.ARG_TYPES.VEC3:
+			var split_str: PoolStringArray = trigger.split(",", false, 3)
+			if split_str.size() == 3:
+				if split_str[0].is_valid_float():
+					if split_str[1].is_valid_float():
+						if split_str[2].is_valid_float():
+							return true
+	return false
+
+
 func process_command(command: String) -> void:
-	for r in console_commands:
-		if command in r.command_triggers[0]:
-			print("yes")
-		else:
-			print("no")
-	pass # TODO -> Command Processing
+	# TODO -> Full Command Processing
+	write_to_output(">>> %s" % command)
+	var split_str: Array = command.split(" ", true)
+	for i in range(split_str.count("")):
+		split_str.erase("")
+
+	var command_word: String = split_str.pop_front()
+	for cmd in console_commands:
+		if cmd.command_triggers[0] == command_word:
+			if cmd.command_triggers.size() == 1:
+				write_to_output(cmd.call("_execute_command"))
+				return
+			if split_str.size() != cmd.command_triggers.size() - 1:
+				write_error_to_output("Failure executing Command '%s', expected '%s' arguments." % [
+						command_word, cmd.command_triggers.size() - 1])
+				return
+			for i in range(split_str.size()):
+				if not check_trigger_type(split_str[i], cmd.command_triggers[i -1]):
+					write_error_to_output("Failure executing Command '%s', argument '%s:%s' is of wrong tpye." % [
+							command_word, i, split_str[i]])
+					return
+			write_to_output(cmd.call("_execute_command", split_str))
+			return
+	write_error_to_output("Entered Command is non-existent.")
