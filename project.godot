@@ -9,12 +9,18 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Control",
+"class": "Console",
+"language": "GDScript",
+"path": "res://c1mConsole/Scripts/c1m_console.gd"
+}, {
 "base": "Reference",
 "class": "ConsoleCommand",
 "language": "GDScript",
 "path": "res://c1mConsole/Scripts/console_command.gd"
 } ]
 _global_script_class_icons={
+"Console": "",
 "ConsoleCommand": "res://c1mConsole/Assets/Textures/console_command_class_icon.png"
 }
 

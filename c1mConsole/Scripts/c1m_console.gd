@@ -1,11 +1,18 @@
+class_name Console
 extends Control
+
+# Class Constants
+const CONSOLE_VERSION: String = "0.0.1"
 
 # Class Variables -> OnReady
 onready var ConsoleInput: LineEdit = $Input
 onready var ConsoleOutput: RichTextLabel = $Output
 
 # Class Variables -> Exported
+export(bool) var use_syntax_highlighting: bool = true
 export(bool) var hide_on_ready: bool = true
+export(Color) var valid_command_clr: Color = Color(0, 1, 0)
+export(Color) var invalid_command_clr: Color = Color(1, 0, 0)
 export(Color) var output_line_number_clr: Color = Color(0, 1, 0.5)
 
 # Class Variables -> Data
@@ -33,6 +40,7 @@ func _input(event: InputEvent) -> void:
 # Class Functions -> Creation
 func create_console_commands() -> void:
 	var cc_file_names: PoolStringArray = [  ]
+	console_commands.clear()
 
 	# Get File Names for the Files in the ConsoleCommands Directory
 	var dir: Directory = Directory.new()
@@ -54,8 +62,11 @@ func create_console_commands() -> void:
 
 
 # Class Functions -> Signal
-func _on_Input_text_changed(_new_text: String) -> void:
-	pass # TODO -> Syntax Highlighting
+func _on_Input_text_changed(new_text: String) -> void:
+	if use_syntax_highlighting and not new_text.empty():
+		ConsoleInput.add_color_override("font_color", invalid_command_clr)
+		if is_valid_command(new_text):
+			ConsoleInput.add_color_override("font_color", valid_command_clr)
 
 
 func _on_Input_text_entered(new_text: String) -> void:
@@ -79,7 +90,8 @@ func write_to_output(text: String) -> void:
 		return
 	elif text.begins_with("!"):
 		var text_split: PoolStringArray = text.split("!", false, 1)
-		write_error_to_output(text_split[0])
+		if text_split:
+			write_error_to_output(text_split[0])
 		return
 
 	output_line_count += 1
@@ -101,7 +113,7 @@ func write_error_to_output(description: String) -> void:
 
 
 # Class Functions -> Command Processing
-func check_trigger_type(trigger: String, type: int) -> bool:
+static func check_trigger_type(trigger: String, type: int) -> bool:
 	match type:
 		ConsoleCommand.ARG_TYPES.INT:
 			return trigger.is_valid_integer()
@@ -127,9 +139,28 @@ func check_trigger_type(trigger: String, type: int) -> bool:
 	return false
 
 
+func is_valid_command(command: String) -> bool:
+	var split_str: Array = command.split(" ", true)
+	for i in range(split_str.count("")):
+		split_str.erase("")
+	
+	var command_word: String = split_str.pop_front()
+	for cmd in console_commands:
+		if cmd.command_triggers[0] == command_word:
+			if cmd.command_triggers.size() == 1:
+				return true
+			if split_str.size() != cmd.command_triggers.size() - 1:
+				return false
+			for i in range(split_str.size()):
+				if not check_trigger_type(split_str[i], int(cmd.command_triggers[i - 1])):
+					return false
+			return true
+	return false
+
+
 func process_command(command: String) -> void:
 	# TODO -> Full Command Processing
-	write_to_output(">>> %s" % command)
+	write_to_output("[color=#aaff00][b]>>> %s[/b][/color]" % command)
 	var split_str: Array = command.split(" ", true)
 	for i in range(split_str.count("")):
 		split_str.erase("")
@@ -145,7 +176,7 @@ func process_command(command: String) -> void:
 						command_word, cmd.command_triggers.size() - 1])
 				return
 			for i in range(split_str.size()):
-				if not check_trigger_type(split_str[i], cmd.command_triggers[i -1]):
+				if not check_trigger_type(split_str[i], int(cmd.command_triggers[i - 1])):
 					write_error_to_output("Failure executing Command '%s', argument '%s:%s' is of wrong tpye." % [
 							command_word, i, split_str[i]])
 					return

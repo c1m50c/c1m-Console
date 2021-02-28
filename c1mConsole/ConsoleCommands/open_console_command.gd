@@ -3,7 +3,7 @@ extends ConsoleCommand
 # Extended Functions
 func _init() -> void:
 	command_triggers = ["open", ARG_TYPES.STRING]
-	help_info = ["open <path / open_names>", "open_names = 'github'"]
+	help_info = ["open <path / open_names>", "open_names = [github]"]
 
 
 func _execute_command(args: Array = []) -> String:
