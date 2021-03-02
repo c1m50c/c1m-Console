@@ -2,7 +2,7 @@ class_name Console
 extends Control
 
 # Class Constants
-const CONSOLE_VERSION: String = "0.0.1"
+const CONSOLE_VERSION: String = "1.0.0"
 
 # Class Variables -> OnReady
 onready var ConsoleInput: LineEdit = $Input
@@ -17,6 +17,7 @@ export(Color) var output_line_number_clr: Color = Color(0, 1, 0.5)
 
 # Class Variables -> Data
 var output_line_count: int = 0
+var prior_entered_string: String = ""
 var console_commands: Array = [  ]
 
 
@@ -33,7 +34,8 @@ func _input(event: InputEvent) -> void:
 	var just_pressed: bool = event.is_pressed() and not event.is_echo()
 	if Input.is_key_pressed(KEY_QUOTELEFT) and just_pressed:
 		visible = !visible
-
+	elif Input.is_key_pressed(KEY_UP) and just_pressed:
+		ConsoleInput.text = prior_entered_string
 
 
 
@@ -70,6 +72,7 @@ func _on_Input_text_changed(new_text: String) -> void:
 
 
 func _on_Input_text_entered(new_text: String) -> void:
+	prior_entered_string = new_text
 	process_command(new_text)
 
 
@@ -141,7 +144,7 @@ static func check_trigger_type(trigger: String, type: int) -> bool:
 
 func is_valid_command(command: String) -> bool:
 	var split_str: Array = command.split(" ", true)
-	for i in range(split_str.count("")):
+	for _i in range(split_str.count("")):
 		split_str.erase("")
 	
 	var command_word: String = split_str.pop_front()
@@ -162,7 +165,7 @@ func process_command(command: String) -> void:
 	# TODO -> Full Command Processing
 	write_to_output("[color=#aaff00][b]>>> %s[/b][/color]" % command)
 	var split_str: Array = command.split(" ", true)
-	for i in range(split_str.count("")):
+	for _i in range(split_str.count("")):
 		split_str.erase("")
 
 	var command_word: String = split_str.pop_front()
@@ -182,4 +185,4 @@ func process_command(command: String) -> void:
 					return
 			write_to_output(cmd.call("_execute_command", split_str))
 			return
-	write_error_to_output("Entered Command is non-existent.")
+	write_error_to_output("Entered Command is non-existent, try 'help'.")

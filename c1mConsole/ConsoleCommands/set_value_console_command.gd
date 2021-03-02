@@ -13,7 +13,7 @@ var property_info: Dictionary = {
 func _init() -> void:
 	# Due to their being few ARG_TYPES, 2nd Arguement ( Value ) will be string, will convert in dif function
 	command_triggers = ["set_value", ARG_TYPES.STRING, ARG_TYPES.STRING]
-	help_info = ["set_value <property_name> <property_value>"]
+	help_info = ["set_value <property_name> <property_value>", "<property_name:property_type> = %s" % get_properties()]
 
 
 func _execute_command(args: Array = []) -> String:
@@ -42,6 +42,17 @@ func _execute_command(args: Array = []) -> String:
 
 
 # Script Functions
+func get_properties() -> PoolStringArray:
+	var array: PoolStringArray = [  ]
+	for key in property_info:
+		array.append("%s:%s" % [ key, ARG_TYPES.keys()[property_info[key][2]] ])
+	return array
+
+
+func add_property(property_name: String, property_holder: Object, property_set_method: String, property_type: int) -> void:
+	property_info[property_name] = [ property_holder, property_set_method, property_type ]
+
+
 func convert_to_vector_2(string: String = "") -> Vector2:
 	var split_str: PoolStringArray = string.split(",", false, 2)
 	if split_str.size() != 2:
