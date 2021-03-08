@@ -30,9 +30,9 @@ func _execute_command(args: Array = []) -> String:
 					ARG_TYPES.STRING:
 						property_info[key][0].call(property_info[key][1], args[1])
 					ARG_TYPES.VEC2:
-						property_info[key][0].call(property_info[key][1], convert_to_vector_2(args[1]))
+						property_info[key][0].call(property_info[key][1], Console.str_to_vec2(args[1]))
 					ARG_TYPES.VEC3:
-						property_info[key][0].call(property_info[key][1], convert_to_vector_3(args[1]))
+						property_info[key][0].call(property_info[key][1], Console.str_to_vec3(args[1]))
 				return ""
 			else:
 				return "![b]set_value: [/b]Cannot convert Argument:2 to proper type."
@@ -51,23 +51,3 @@ func get_properties() -> PoolStringArray:
 
 func add_property(property_name: String, property_holder: Object, property_set_method: String, property_type: int) -> void:
 	property_info[property_name] = [ property_holder, property_set_method, property_type ]
-
-
-func convert_to_vector_2(string: String = "") -> Vector2:
-	var split_str: PoolStringArray = string.split(",", false, 2)
-	if split_str.size() != 2:
-		return Vector2()
-	for s in split_str:
-		if not Console.check_trigger_type(s, ARG_TYPES.FLOAT):
-			return Vector2()
-	return Vector2(float(split_str[0]), float(split_str[1]))
-
-
-func convert_to_vector_3(string: String = "") -> Vector3:
-	var split_str: PoolStringArray = string.split(",", false, 3)
-	if split_str.size() != 3:
-		return Vector3()
-	for s in split_str:
-		if not Console.check_trigger_type(s, ARG_TYPES.FLOAT):
-			return Vector3()
-	return Vector3(float(split_str[0]), float(split_str[1]), float(split_str[2]))

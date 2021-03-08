@@ -2,7 +2,7 @@ class_name Console
 extends Control
 
 # Class Constants
-const CONSOLE_VERSION: String = "1.1.11"
+const CONSOLE_VERSION: String = "1.1.12"
 
 # Class Variables -> OnReady
 onready var ConsoleInput: LineEdit = $Input
