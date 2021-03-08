@@ -7,6 +7,10 @@ enum ARG_TYPES { INT, FLOAT, BOOL, STRING, VEC2, VEC3 }
 # Class Variables
 var help_info: Array = [
 	# Holds strings that get printed to the output when the 'help' command is executed
+	# See various built-in command's '_init' method for examples, Proper format goes...
+
+	# "command_trigger + <ARG_TYPES/Argument Names>",
+	# "<Argument_Name> = [Argument Names]",
 ]
 var command_triggers: Array = [
 	"command_trigger", # Command Name
@@ -27,4 +31,5 @@ func _init() -> void:
 # Class Functions
 #warning-ignore:unused_argument
 func _execute_command(args: Array = []) -> String:
+	# Returned String will be printed out into the ConsoleOutput, prefix String with a '!' to call an error
 	return ""

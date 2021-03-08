@@ -2,18 +2,18 @@ class_name Console
 extends Control
 
 # Class Constants
-const CONSOLE_VERSION: String = "1.0.0"
+const CONSOLE_VERSION: String = "1.1.0"
 
 # Class Variables -> OnReady
 onready var ConsoleInput: LineEdit = $Input
 onready var ConsoleOutput: RichTextLabel = $Output
 
 # Class Variables -> Exported
-export(bool) var use_syntax_highlighting: bool = true
+export(bool) var use_input_validity_highlighting: bool = true
 export(bool) var hide_on_ready: bool = true
-export(Color) var valid_command_clr: Color = Color(0, 1, 0)
-export(Color) var invalid_command_clr: Color = Color(1, 0, 0)
-export(Color) var output_line_number_clr: Color = Color(0, 1, 0.5)
+export(Color) var valid_command_clr: Color = Color8(252, 192, 93)
+export(Color) var invalid_command_clr: Color = Color8(193, 80, 80)
+export(Color) var output_line_number_clr: Color = Color8(246, 146, 93)
 
 # Class Variables -> Data
 var output_line_count: int = 0
@@ -65,7 +65,7 @@ func create_console_commands() -> void:
 
 # Class Functions -> Signal
 func _on_Input_text_changed(new_text: String) -> void:
-	if use_syntax_highlighting and not new_text.empty():
+	if use_input_validity_highlighting and not new_text.empty():
 		ConsoleInput.add_color_override("font_color", invalid_command_clr)
 		if is_valid_command(new_text):
 			ConsoleInput.add_color_override("font_color", valid_command_clr)
@@ -110,13 +110,14 @@ func write_error_to_output(description: String) -> void:
 	output_line_count += 1
 	ConsoleOutput.bbcode_text = ConsoleOutput.bbcode_text + "\n%s %s" % [ 
 			"[color=#%s]" % [output_line_number_clr.to_html()] + str(output_line_count) + ".[/color]", 
-			"[color=#ff0000][b]ERROR: [/b][/color]" + description]
+			"[color=#c15050][b]ERROR: [/b][/color]" + description]
 
 
 
 
 # Class Functions -> Command Processing
 static func check_trigger_type(trigger: String, type: int) -> bool:
+	# Checks String(trigger) if it can be converted properly into the passed type
 	match type:
 		ConsoleCommand.ARG_TYPES.INT:
 			return trigger.is_valid_integer()
@@ -143,6 +144,7 @@ static func check_trigger_type(trigger: String, type: int) -> bool:
 
 
 func is_valid_command(command: String) -> bool:
+	# Copy and Paste ftw
 	var split_str: Array = command.split(" ", true)
 	for _i in range(split_str.count("")):
 		split_str.erase("")
@@ -162,8 +164,7 @@ func is_valid_command(command: String) -> bool:
 
 
 func process_command(command: String) -> void:
-	# TODO -> Full Command Processing
-	write_to_output("[color=#aaff00][b]>>> %s[/b][/color]" % command)
+	write_to_output("[color=#693c72][b]>>> %s[/b][/color]" % command)
 	var split_str: Array = command.split(" ", true)
 	for _i in range(split_str.count("")):
 		split_str.erase("")
