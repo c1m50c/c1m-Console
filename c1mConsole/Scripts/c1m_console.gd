@@ -2,7 +2,7 @@ class_name Console
 extends Control
 
 # Class Constants
-const CONSOLE_VERSION: String = "1.1.0"
+const CONSOLE_VERSION: String = "1.1.1"
 
 # Class Variables -> OnReady
 onready var ConsoleInput: LineEdit = $Input
@@ -187,3 +187,28 @@ func process_command(command: String) -> void:
 			write_to_output(cmd.call("_execute_command", split_str))
 			return
 	write_error_to_output("Entered Command is non-existent, try 'help'.")
+
+
+
+
+# Class Functions -> Quality of Life
+static func str_to_vec2(string: String, err_check: bool = true) -> Vector2:
+	var split_str: PoolStringArray = string.split(",", false, 2)
+	if split_str.size() == 2:
+		if err_check:
+			for s in split_str:
+				if not check_trigger_type(s, ConsoleCommand.ARG_TYPES.VEC2):
+					return Vector2.ZERO
+		return Vector2(float(split_str[0]), float(split_str[1]))
+	return Vector2.ZERO
+
+
+static func str_to_vec3(string: String, err_check: bool = true) -> Vector3:
+	var split_str: PoolStringArray = string.split(",", false, 3)
+	if split_str.size() == 3:
+		if err_check:
+			for s in split_str:
+				if not check_trigger_type(s, ConsoleCommand.ARG_TYPES.VEC3):
+					return Vector3.ZERO
+		return Vector3(float(split_str[0]), float(split_str[1]), float(split_str[2]))
+	return Vector3.ZERO
